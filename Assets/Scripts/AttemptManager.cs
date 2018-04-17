@@ -10,11 +10,20 @@ public class AttemptManager : MonoBehaviour {
     public int MaxAttempts;
     private int CurrentAttempt;
     private LevelManager LevelManager;
+    private GameObject DialogBox;
+    private Image TransparentImage;
 
 	// Use this for initialization
 	void Start () {
         CurrentAttempt = 0;
         LevelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+
+        DialogBox = GameObject.Find("LostDialogBox");
+        DialogBox.SetActive(false);
+
+        TransparentImage = GameObject.Find("TransparentImage").GetComponent<Image>();
+        TransparentImage.enabled = false;
+
     }
 	
 	// Update is called once per frame
@@ -23,7 +32,9 @@ public class AttemptManager : MonoBehaviour {
             Attempts.sprite = HeartSprites[CurrentAttempt];
         else {
             Attempts.sprite = HeartSprites[CurrentAttempt];
-            LevelManager.LoadLevel("Menu");
+            TransparentImage.enabled = true;
+            DialogBox.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 

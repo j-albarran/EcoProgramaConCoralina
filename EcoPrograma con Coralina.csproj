@@ -284,6 +284,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\AttemptManager.cs" />
+    <Compile Include="Assets\Scripts\GameLevel.cs" />
+    <Compile Include="Assets\Scripts\HUDManager.cs" />
     <Compile Include="Assets\Scripts\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\LevelManager.cs" />
     <Compile Include="Assets\Scripts\ScoreManager.cs" />

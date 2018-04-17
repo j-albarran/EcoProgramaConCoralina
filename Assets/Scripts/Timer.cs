@@ -6,31 +6,39 @@ using UnityEngine.UI;
 
 public class Timer : MonoBehaviour {
 
-    public Image img;
+    public Image pauseImg;
+    public Sprite[] icons;
+    public Image filler;
+    public Image pauseButton;
 
     public int levelSeconds;
 
-    private int minutes;
-    private int seconds;
-    private float millis;
-    private int secondsLeft;
-    private Text text;
+    //private int minutes;
+    //private int seconds;
+    //private float millis;
+    //private int secondsLeft;
+    private float timeLeft;
+    // private Text text;
     private bool paused;
+    private int currentIcon;
 
 	// Use this for initialization
 	void Start () {
-        text = GetComponent<Text>();
-        secondsLeft = levelSeconds;
+        //text = GetComponent<Text>();
+        //secondsLeft = levelSeconds;
+        timeLeft = levelSeconds;
+        filler.fillAmount = 1.0f;
         paused = false;
-        img = GameObject.Find("PauseImage").GetComponent<Image>();
-        img.enabled = false;
+        pauseImg.enabled = false;
+        pauseButton = GameObject.Find("PauseButton").GetComponent<Image>();
         Time.timeScale = 1;
+        currentIcon = 0;
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (!paused) {
-            minutes = secondsLeft / 60;
+            /*minutes = secondsLeft / 60;
             seconds = secondsLeft % 60;
             millis = ((float)levelSeconds - Time.timeSinceLevelLoad) * 1000;
             millis = millis % 1000;
@@ -43,17 +51,37 @@ public class Timer : MonoBehaviour {
             if (secondsLeft == 0 && millis <= 0) {
                 // TODO: Add feedback/message indicating no time left
                 SceneManager.LoadScene("Menu");
+            }*/
+
+            filler.fillAmount = timeLeft/levelSeconds;
+
+            timeLeft = levelSeconds - Time.timeSinceLevelLoad;
+
+            // Verify remaining time
+            if (timeLeft <= 0) {
+                // TODO: Add feedback/message indicating no time left
+                SceneManager.LoadScene("Menu");
             }
         }
     }
 
     public void Pause () {
         paused = !paused;
-        img.enabled = !img.enabled;
+
+        // Enable/Disable pause image to block game screen
+        pauseImg.enabled = !pauseImg.enabled;
+
+        // Change button sprite
+        currentIcon = (currentIcon + 1) % icons.Length;
+        pauseButton.sprite = icons[currentIcon];
+
+        // Stop timer
         if (paused)
             Time.timeScale = 0;
         else
             Time.timeScale = 1;
+
+
         // TODO: Pause all components of the game
     }
 }
