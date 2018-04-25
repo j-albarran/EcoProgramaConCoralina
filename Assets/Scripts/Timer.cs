@@ -6,61 +6,55 @@ using UnityEngine.UI;
 
 public class Timer : MonoBehaviour {
 
-    public Image pauseImg;
-    public Sprite[] icons;
-    public Image filler;
-    public Image pauseButton;
+    private GameObject AttemptManager;
+    private DialogBoxManager DialogBoxManager;
 
     public int levelSeconds;
 
-    //private int minutes;
-    //private int seconds;
-    //private float millis;
-    //private int secondsLeft;
+    private Image filler;
     private float timeLeft;
-    // private Text text;
     private bool paused;
-    private int currentIcon;
+    private float StartTime;
+    private float ElapsedTime;
+    private float LoadTime;
 
-	// Use this for initialization
-	void Start () {
-        //text = GetComponent<Text>();
-        //secondsLeft = levelSeconds;
+    // Use this for initialization
+    void Start () {
+        AttemptManager = GameObject.Find("AttemptManager");
+        DialogBoxManager = GameObject.Find("DialogBoxManager").GetComponent<DialogBoxManager>();
+
+        // Initialize timer bar characteristics
+        filler = transform.Find("Mask/Filler").gameObject.GetComponent<Image>();
         timeLeft = levelSeconds;
         filler.fillAmount = 1.0f;
+
+        // Start unpaused
         paused = false;
-        pauseImg.enabled = false;
-        pauseButton = GameObject.Find("PauseButton").GetComponent<Image>();
         Time.timeScale = 1;
-        currentIcon = 0;
+
+        // Initialize with saved data if any
+        ElapsedTime = PersistentGameManager.Instance.ElapsedTime;
+        StartTime = PersistentGameManager.Instance.StartTime;
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (!paused) {
-            /*minutes = secondsLeft / 60;
-            seconds = secondsLeft % 60;
-            millis = ((float)levelSeconds - Time.timeSinceLevelLoad) * 1000;
-            millis = millis % 1000;
-
-            text.text = "Tiempo: " + minutes.ToString("00") + ":" + seconds.ToString("00") + "." + (int)(millis / 10);
-
-            secondsLeft = (int)((float)levelSeconds - Time.timeSinceLevelLoad);
-
-            // Verify remaining time
-            if (secondsLeft == 0 && millis <= 0) {
-                // TODO: Add feedback/message indicating no time left
-                SceneManager.LoadScene("Menu");
-            }*/
-
             filler.fillAmount = timeLeft/levelSeconds;
 
-            timeLeft = levelSeconds - Time.timeSinceLevelLoad;
+            ElapsedTime = Time.time - StartTime;
+            timeLeft = levelSeconds - ElapsedTime;
 
             // Verify remaining time
             if (timeLeft <= 0) {
-                // TODO: Add feedback/message indicating no time left
-                SceneManager.LoadScene("Menu");
+                AttemptManager.GetComponent<AttemptManager>().LoseAttemptTimer();
+                // Verify number of attempts left
+                if (AttemptManager.GetComponent<AttemptManager>().GetCurrentAttempts() == AttemptManager.GetComponent<AttemptManager>().GetMaxAttempts())
+                    DialogBoxManager.TimerDialogBox2();
+                else {
+                    DialogBoxManager.TimerDialogBox1On();
+                    ResetTime();
+                }
             }
         }
     }
@@ -68,20 +62,36 @@ public class Timer : MonoBehaviour {
     public void Pause () {
         paused = !paused;
 
-        // Enable/Disable pause image to block game screen
-        pauseImg.enabled = !pauseImg.enabled;
-
-        // Change button sprite
-        currentIcon = (currentIcon + 1) % icons.Length;
-        pauseButton.sprite = icons[currentIcon];
-
         // Stop timer
         if (paused)
             Time.timeScale = 0;
-        else
+        else {
             Time.timeScale = 1;
+        }
+    }
 
+    public void ResetTime() {
+        timeLeft = levelSeconds;
+        ElapsedTime = 0;
+    }
 
-        // TODO: Pause all components of the game
+    public void SetStartTime(float st) {
+        StartTime = st;
+    }
+
+    public float GetStartTime() {
+        return StartTime;
+    }
+
+    public void SetElapsedTime(float ElapsedTime) {
+        this.ElapsedTime = ElapsedTime;
+    }
+
+    public float GetElapsedTime() {
+        return ElapsedTime;
+    }
+
+    public float GetLoadTime() {
+        return Time.time;
     }
 }

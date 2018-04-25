@@ -11,15 +11,23 @@ public class ScoreManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         text = GetComponent<Text>();
-        currentScore = 0;
+        currentScore = PersistentGameManager.Instance.CurrentScore;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        text.text = "Puntos: " + currentScore;
+        text.text = "Puntos: " + currentScore.ToString();
 	}
 
     public void IncrementScore(int delta) {
         currentScore += delta;
+    }
+
+    public void SetCurrentScore(int currentScore) {
+        this.currentScore = currentScore;
+    }
+
+    public int GetCurrentScore() {
+        return currentScore;
     }
 }
